@@ -1,0 +1,641 @@
+package ejerciciojflex;
+import java.util.ArrayList;
+
+import java_cup.runtime.Symbol;
+
+parser code
+{:
+    public ArrayList<Object> listaIdentificadores = new ArrayList<Object>(); 
+    public int cont = 0;
+    public int contErr =0;
+    private Symbol s;
+    
+    public void syntax_error(Symbol s){
+        this.s = s;
+    }
+
+    public Symbol getS(){
+        return this.s;
+}
+:};
+
+terminal Tipo,Nulo,Flotante,ExprLogica,Boolean,Asig,Separador,ExprFinal,Comillas,
+Cadena,EstruControl,Operador,Id,Char,Int,String,If,Else,DecInc,
+While,For,Switch,Return,Break,Case,Default,Print,Multiplicacion,Suma,Resta,Parametros,
+Division,ParentesisC,ParentesisA,LlaveC,LlaveA,main,CorcheteA,CorcheteC,Coma,DosPuntos,Read,
+ERROR,Float,Bool,True,False,IgualIgual,Diferente,Menor,MenorIgual,Mayor,MayorIgual,Negacion,Or,And, CharType;
+terminal Object Entero;
+non terminal INICIO,listaSent, SENTENCIA,PARTE_ELSE,DECLARACION_IF,ELSE,SENTENCIA_WHILE,DECLARACION_ENTEROS,DECLARACION_FLOAT,DECLARACION_STRING,DECLARACION_BOOLEAN,DECLARACION_CHAR,FUNCION,PARAMETROS,PARAMETROS_AUX; 
+non terminal String EXPR,EXPRSTR,FACTORSTR,FACTOR,TERMINOSTR,TERMINO;
+non terminal String SENT;
+non terminal EtiquetaRedir PARTEIF;
+non terminal DosEtiquetas CONDICION;
+non terminal EtiquetaRedir parteWhile;
+start with INICIO;
+
+INICIO ::= Int main ParentesisA ParentesisC LlaveA SENTENCIA LlaveC 
+;
+SENTENCIA::=DECLARACION_ENTEROS|SENTENCIA SENT|SENT|SENTENCIA DECLARACION_ENTEROS|SENTENCIA  DECLARACION_CHAR|DECLARACION_CHAR|DECLARACION_FLOAT|SENTENCIA DECLARACION_FLOAT|DECLARACION_STRING|SENTENCIA DECLARACION_STRING|DECLARACION_BOOLEAN|SENTENCIA DECLARACION_BOOLEAN|FUNCION|SENTENCIA FUNCION
+;
+DECLARACION_ENTEROS::=Int:n1 Id:n2 ExprFinal{:
+                 parser.listaIdentificadores.add(n1);
+                 parser.listaIdentificadores.add(n2);
+                 parser.listaIdentificadores.add(0);
+                 GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,"0",null,n2.toString());
+                 System.out.println("Declaracion de variable entera " + n2 + " sin valor");:}
+                |Int:n1 Id:n2 Asig EXPR:n3 ExprFinal {:
+                  if(n3.contains(".")){
+                        System.out.println("ERROR SEMANTICO: EL TIPO INT NO RECONOCE: "+n3);
+
+                  }else{
+                        parser.listaIdentificadores.add(n1);
+                        parser.listaIdentificadores.add(n2);
+                        parser.listaIdentificadores.add(n3);
+                       //System.out.println(" El resultado de la operacion N3: ");
+                        //System.out.println("Declaracion de variable entera " + n2 + "con valor: "+n3);
+                        //String t=GeneradorTresDirecciones.nuevaTemp();
+                        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n3.toString(),null,n2.toString());
+
+                  }
+                  
+                  
+                :}/*|Id:n1 Asig Entero:n2 ExprFinal {:
+                    boolean bandera = false;
+                    for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                        if(parser.listaIdentificadores.get(i).equals(n1)){
+                            if(parser.listaIdentificadores.get(i-1).equals("int")){
+                                parser.listaIdentificadores.set(i+1,n2);
+                                System.out.println("Asignacion de la variable " + n1 + " Se le asigno el valor: " + n2);
+                                 GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n2.toString(),null,n1.toString());
+                                bandera = true;
+                                break;
+                            }else{
+                                System.out.println("ERROR SEMANTICO: LA VARIABLE ENCONTRADA NO ES DE TIPO ENTERO");
+                            }
+                        }
+                    }
+                    if(bandera){
+
+                    }else{
+                        parser.contErr+=1;
+                        System.out.println("ERROR SEMANTICO:LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                    }
+                :}*/|Float:n1 Id:n2 Asig EXPR:n3 ExprFinal {:
+                  parser.listaIdentificadores.add(n1);
+                  parser.listaIdentificadores.add(n2);
+                  parser.listaIdentificadores.add(n3);
+                 //System.out.println(" El resultado de la operacion N3: "+Integer.valueOf(n3.toString()));
+                   
+                  //String t=GeneradorTresDirecciones.nuevaTemp();
+                  GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n3.toString(),null,n2.toString());
+                  
+                :}|Float:n1 Id:n2 ExprFinal{:
+                 parser.listaIdentificadores.add(n1);
+                 parser.listaIdentificadores.add(n2);
+                 parser.listaIdentificadores.add(0);
+                 GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,"0",null,n2.toString());
+                 System.out.println("Declaracion de variable entera " + n2 + " sin valor");
+
+                :}/*|Id:n1 Asig Flotante:n2 ExprFinal {:
+                    boolean bandera = false;
+                    for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                        if(parser.listaIdentificadores.get(i).equals(n1)){
+                            if(parser.listaIdentificadores.get(i-1).equals("float")){
+                                parser.listaIdentificadores.set(i+1,n2);
+                                System.out.println("Asignacion de la variable " + n1 + " Se le asigno el valor: " + n2);
+                                 GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n2.toString(),null,n1.toString());
+                                bandera = true;
+                                break;
+                            }else{
+                                System.out.println("ERROR SEMANTICO: LA VARIABLE ENCONTRADA NO ES DE TIPO FLOTANTE");
+                            }
+                        }
+                    }
+                    if(bandera){
+
+                    }else{
+                        System.out.println("ERROR SEMANTICO:LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                    }
+                :}*/|String:n1 Id:n2 ExprFinal{:
+                 parser.listaIdentificadores.add(n1);
+                 parser.listaIdentificadores.add(n2);
+                 parser.listaIdentificadores.add(0);
+                GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG," ",null,n2.toString());
+                 System.out.println("Declaracion de variable String " + n2 + " sin valor");:}
+                |String:n1 Id:n2 Asig EXPRSTR:n3 ExprFinal {:
+                  parser.listaIdentificadores.add(n1);
+                  parser.listaIdentificadores.add(n2);
+                  parser.listaIdentificadores.add(n3);
+                 //System.out.println(" El resultado de la operacion N3: "+Integer.valueOf(n3.toString()));
+                   
+                  //String t=GeneradorTresDirecciones.nuevaTemp();
+                  GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n3.toString(),null,n2.toString());
+                  
+                :}|Id:n1 Asig EXPR:n2 ExprFinal {:
+                
+                boolean bandera = false;
+                boolean bandera2 = false;
+                for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                    
+                    if(parser.listaIdentificadores.get(i).equals(n1)){
+                            
+                            bandera2=true;
+                      
+                              
+                                
+                                   
+                                       
+                                        
+                                        //parser.listaIdentificadores.add(parser.listaIdentificadores.get(j-1));
+                                        //parser.listaIdentificadores.add(n1);
+                                        //parser.listaIdentificadores.add(parser.listaIdentificadores.get(j+1));
+                                        //System.out.println("Identificador de la lista: "+ parser.listaIdentificadores.get(i)+ "  Variable que compara: "+ n1);
+                                        parser.listaIdentificadores.set(i+1,n2.toString());
+                                        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n2.toString(),null,parser.listaIdentificadores.get(i).toString());
+                                        //System.out.println("Asignacion de la variable " + n1 + " Se le asigno el valor: " + parser.listaIdentificadores.get(j+1));
+                                        bandera = true;
+                                        break;
+                                    
+                                
+                            
+                    }
+                }if(bandera2){
+                    
+                }else{
+                   parser.contErr+=1;
+                   System.out.println("ERROR SEMANTICO: LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                }
+             :}
+
+                /*|Id:n1 Asig Cadena:n2 ExprFinal {:
+                boolean bandera = false;
+                for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                    if(parser.listaIdentificadores.get(i).equals(n1)){
+                        if(parser.listaIdentificadores.get(i-1).equals("string")){
+                            parser.listaIdentificadores.set(i+1,n2);
+                            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n2.toString(),null,n1.toString());
+                            System.out.println("Asignacion de la variable " + n1 + " Se le asigno el valor: " + n2);
+                            bandera = true;
+                            break;
+                        }else{
+                            parser.contErr+=1;
+                            System.out.println("ERROR SEMANTICO: LA VARIABLE ENCOTRADA NO ES DE TIPO STRING");
+                        }
+                    }
+                }
+                if(bandera){
+
+                }else{
+                    parser.contErr+=1;
+                    System.out.println("ERROR SEMANTICO:LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                }
+               :}*/|String:n1 Id:n2 Asig Id:n3 ExprFinal {:
+                 //System.out.println(n3);
+                 boolean bandera = false;
+                 for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                    if(parser.listaIdentificadores.get(i).equals(n3)){
+                        if(parser.listaIdentificadores.get(i-1).equals("string")){
+                            parser.listaIdentificadores.add(n1);
+                            parser.listaIdentificadores.add(n2);
+                            parser.listaIdentificadores.add(parser.listaIdentificadores.get(i+1));
+                            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,parser.listaIdentificadores.get(i+1).toString(),null,n2.toString());
+                            System.out.println("Asignacion de la variable " + n2 + " Se le asigno el valor: " + parser.listaIdentificadores.get(i+1));
+                            bandera = true;
+                            break;
+                        }else{
+                            System.out.println("ERROR SEMANTICO: LA VARIABLE ENCONTRADA NO ES DE TIPO STRING");
+                        }
+                    }
+                }
+                if(bandera){
+
+                }else{
+                    parser.contErr+=1;
+                    System.out.println("ERROR SEMANTICO: LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                }
+               :}
+                
+                
+                
+                
+               
+;
+EXPRSTR::=EXPRSTR:n1 Suma:n3 FACTORSTR:n2{:
+               String t=GeneradorTresDirecciones.nuevaTemp();
+               GeneradorTresDirecciones.generador(GeneradorTresDirecciones.MAS,n1.toString(),n2.toString(),t);
+               //System.out.println("Este es n2 " + n2 + "este es n1: " +n1);
+                RESULT= t;
+             :}|FACTORSTR:n1{:
+               //System.out.println("Este es n1 " + n1);
+                //GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n1.toString(),null,parser.listaIdentificadores.get(parser.listaIdentificadores.size()-2).toString());
+              RESULT= n1;
+            :}
+;
+FACTORSTR::=|TERMINOSTR:n1{:
+         RESULT=n1;
+    
+    :}
+
+;
+TERMINOSTR::= Cadena:n1{:
+                    
+                    RESULT=n1.toString();
+                :}
+                /*|Id:n1{:
+                    RESULT=n1.toString();
+                    
+                :}*/
+
+;
+EXPR::=EXPR:n1 Suma:n3 FACTOR:n2{:
+               String t=GeneradorTresDirecciones.nuevaTemp();
+               GeneradorTresDirecciones.generador(GeneradorTresDirecciones.MAS,n1.toString(),n2.toString(),t);
+               //System.out.println("Este es n2 " + n2 + "este es n1: " +n1);
+                RESULT= t;
+             :}|  EXPR:n1 Resta FACTOR:n2{:
+             String t=GeneradorTresDirecciones.nuevaTemp();
+             GeneradorTresDirecciones.generador(GeneradorTresDirecciones.MENOS,n1.toString(),n2.toString(),t);
+             RESULT= t;
+             :}|FACTOR:n1{:
+               //System.out.println("Este es n1 " + n1);
+                //GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n1.toString(),null,parser.listaIdentificadores.get(parser.listaIdentificadores.size()-2).toString());
+              RESULT= n1;
+            :}
+
+;
+FACTOR::=FACTOR:n1 Multiplicacion:n3 TERMINO:n2{:
+     String t=GeneradorTresDirecciones.nuevaTemp();
+     GeneradorTresDirecciones.generador(GeneradorTresDirecciones.POR,n1.toString(),n2.toString(),t);
+    // System.out.println("Pronado n1: " + n1 + " Provando n2 : "+ n2);
+     RESULT= t;
+    :}|FACTOR:n1 Division TERMINO:n2{:
+        String t=GeneradorTresDirecciones.nuevaTemp();
+        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.DIVISION,n1.toString(),n2.toString(),t);
+         RESULT= t;
+    :}|TERMINO:n1{:
+         RESULT=n1;
+    
+    :}
+
+;
+TERMINO::= Entero:n1{:
+                    
+                    RESULT=n1.toString();
+                :}
+                |Id:n1{:
+                    boolean bandera = false;
+                    boolean bandera2 = false;
+                    for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+
+                        if(parser.listaIdentificadores.get(i).equals(n1)){
+
+                                bandera2=true;
+
+                                            
+                        }
+                        }if(bandera2){
+                             RESULT=n1.toString();
+                        }else{
+                           parser.contErr+=1;
+                           System.out.println("ERROR SEMANTICO: LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                           RESULT=n1.toString(); 
+                       }
+                            
+                :}
+              
+                |Flotante:n1{:RESULT=n1.toString();
+                :}
+                | ParentesisA EXPR:e1 ParentesisA {:RESULT=e1;:}
+                | Cadena:n1{:RESULT=n1.toString();:}
+                //|Id ParentesisA ParentesisC {:RESULT=null;:}
+                //|Id ParentesisA PARAMETROS ParentesisC {:RESULT=null;:}
+;
+
+DECLARACION_CHAR::=CharType:n1 Id:n2 ExprFinal{:
+                 parser.listaIdentificadores.add(n1);
+                 parser.listaIdentificadores.add(n2);
+                 parser.listaIdentificadores.add(0);
+                 GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,"",null,n2.toString());
+                 System.out.println("Declaracion de variable Char: " +n2 + " sin valor");:}
+               |CharType:n1 Id:n2 Asig Char:n3 ExprFinal{:
+                  parser.listaIdentificadores.add(n1);
+                  parser.listaIdentificadores.add(n2);
+                  parser.listaIdentificadores.add(n3);
+                  GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n3.toString(),null,n2.toString());
+                  System.out.println("Declaracion de variable Char "+ n2 + " con valor " + n3);:}
+                 
+               |Id:n1 Asig Char:n2 ExprFinal {:
+                boolean bandera = false;
+                for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                    if(parser.listaIdentificadores.get(i).equals(n1)){
+                        if(parser.listaIdentificadores.get(i-1).equals("char")){
+                            parser.listaIdentificadores.set(i+1,n2);
+                            System.out.println("Asignacion de la variable " + n1 + " Se le asigno el valor: " + n2);
+                            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n2.toString(),null,n1.toString());
+                            bandera = true;
+                            break;
+                        }else{
+                            System.out.println("ERROR SEMANTICO: LA VARIABLE ENCOTRADA NO ES DE TIPO CHAR");
+                        }
+                    }
+                }
+                if(bandera){
+
+                }else{
+                    System.out.println("ERROR:LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                }
+               :}
+              |CharType:n1 Id:n2 Asig Id:n3 ExprFinal {:
+                 boolean bandera = false;
+                 for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                    if(parser.listaIdentificadores.get(i).equals(n3)){
+                        if(parser.listaIdentificadores.get(i-1).equals("char")){
+                            parser.listaIdentificadores.add(n1);
+                            parser.listaIdentificadores.add(n2);
+                            parser.listaIdentificadores.add(parser.listaIdentificadores.get(i+1));
+                            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n3.toString(),null,n2.toString());
+                            System.out.println("Asignacion de la variable " + n2 + " Se le asigno el valor: " + parser.listaIdentificadores.get(i+1));
+                            bandera = true;
+                            break;
+                        }else{
+                            System.out.println("ERROR SEMANTICO: LA VARIABLE ENCONTRADA NO ES DE TIPO CHAR");
+                        }
+                    }
+                }
+                if(bandera){
+
+                }else{
+                    System.out.println("ERROR SEMANTICO: LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                }
+               :}
+;
+
+
+DECLARACION_BOOLEAN::=Bool:n1 Id:n2 ExprFinal{:
+                 parser.listaIdentificadores.add(n1);
+                 parser.listaIdentificadores.add(n2);
+                 parser.listaIdentificadores.add(0);
+                 GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,"false",null,n2.toString());
+                
+                 System.out.println("Declaracion de variable Boolean: " +n2 + " sin valor");:}
+               |Bool:n1 Id:n2 Asig Boolean:n3 ExprFinal{:
+                  parser.listaIdentificadores.add(n1);
+                  parser.listaIdentificadores.add(n2);
+                  parser.listaIdentificadores.add(n3);
+                  GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n3.toString(),null,n2.toString());
+                  System.out.println("Declaracion de variable Boolean "+ n2 + " con valor " + n3);:}
+               /*|Bool:n1 Id:n2 Asig False:n3 ExprFinal{:
+                  parser.listaIdentificadores.add(n1);
+                  parser.listaIdentificadores.add(n2);
+                  parser.listaIdentificadores.add(n3);
+                  System.out.println("Declaracion de variable Boolean "+ n2 + " con valor " + n3);:}*/
+               |Id:n1 Asig Boolean:n2 ExprFinal {:
+                boolean bandera = false;
+                for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                    if(parser.listaIdentificadores.get(i).equals(n1)){
+                        if(parser.listaIdentificadores.get(i-1).equals("bool")){
+                            parser.listaIdentificadores.set(i+1,n2);
+                            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,n1.toString(),null,n2.toString());
+                            System.out.println("Asignacion de la variable " + n1 + " Se le asigno el valor: " + n2);
+                            bandera = true;
+                            break;
+                        }else{
+                             parser.contErr+=1;
+                            System.out.println("ERROR SEMANTICO: LA VARIABLE ENCOTRADA NO ES DE TIPO BOOLEAN");
+                        }
+                    }
+                }
+                if(bandera){
+
+                }else{
+                    System.out.println("ERROR SEMANTICO:LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                }
+               :}
+             /*|Id:n1 Asig False:n2 ExprFinal {:
+                boolean bandera = false;
+                for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                    if(parser.listaIdentificadores.get(i).equals(n1)){
+                        if(parser.listaIdentificadores.get(i-1).equals("bool")){
+                            parser.listaIdentificadores.set(i+1,n2);
+                            System.out.println("Asignacion de la variable " + n1 + " Se le asigno el valor: " + n2);
+                            bandera = true;
+                            break;
+                        }else{
+                            System.out.println("ERROR SEMANTICO: LA VARIABLE ENCOTRADA NO ES DE TIPO BOOLEAN");
+                        }
+                    }
+                }
+                if(bandera){
+
+                }else{
+                    System.out.println("ERROR SEMANTICO:LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                }
+               :}*/
+             |Bool:n1 Id:n2 Asig Id:n3 ExprFinal {:
+                 boolean bandera = false;
+                 for(int i = 1;i < parser.listaIdentificadores.size();i=i+3){
+                    if(parser.listaIdentificadores.get(i).equals(n3)){
+                        if(parser.listaIdentificadores.get(i-1).equals("bool")){
+                            parser.listaIdentificadores.add(n1);
+                            parser.listaIdentificadores.add(n2);
+                            parser.listaIdentificadores.add(parser.listaIdentificadores.get(i+1));
+                            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.ASIG,parser.listaIdentificadores.get(i+1).toString(),null,n2.toString());
+                            System.out.println("Asignacion de la variable " + n2 + " Se le asigno el valor: " + parser.listaIdentificadores.get(i+1));
+                            bandera = true;
+                            break;
+                        }else{
+                            System.out.println("ERROR SEMANTICO: LA VARIABLE ENCONTRADA NO ES DE TIPO BOOLEAN");
+                        }
+                    }
+                }
+                if(bandera){
+
+                }else{
+                    System.out.println("ERROR SEMANTICO: LA VARIABLE " + n1 + " NO HA SIDO DECLARADA");
+                }
+               :}
+;
+
+//listaSent::=listaSent SENT|SENT;
+
+DECLARACION_IF::= PARTEIF:et CONDICION:cond ParentesisC{: GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL, null, null, cond.v());:} SENT {:
+       
+        String fin = GeneradorTresDirecciones.nuevaEtiqueta();
+        //System.out.println("EL VALOR DE FIN= "+fin);
+        et.fin(fin);           
+        //System.out.println("EL VALOR DE ET= "+et.getFin());
+        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, et.getFin());
+        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL, null, null, cond.f());
+        
+        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL, null, null, et.getFin());
+    :}
+    
+    
+;
+
+PARTEIF::= If ParentesisA {: 
+        RESULT = new EtiquetaRedir(null,null);
+    :}
+;
+
+PARTE_ELSE::= Else SENT {: :}
+      
+    
+;
+
+SENT::= EXPR:e1 ExprFinal {: RESULT = e1; :}
+        |LlaveA SENTENCIA:s LlaveC {::}
+        |Print ParentesisA EXPR:e ParentesisC ExprFinal {:
+            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.PRINT, null, null, e);
+          :}
+        |Read ParentesisA EXPR:e ParentesisC ExprFinal{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.READ, null, null, e);:}
+        |DECLARACION_IF {::}//|PARTE_ELSE
+        |SENTENCIA_WHILE {::}
+        /*|SENTDOWHILE {::}
+        |SENTFOR {::}*/
+;
+
+CONDICION::= EXPR:e1 IgualIgual EXPR:e2{:
+    String v = GeneradorTresDirecciones.nuevaEtiqueta();
+    String f = GeneradorTresDirecciones.nuevaEtiqueta();
+    GeneradorTresDirecciones.generador(GeneradorTresDirecciones.IFEQUAL, e1, e2, v);    
+    GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, f);
+    RESULT = new DosEtiquetas(v, f);
+    :}
+    |EXPR:e1 Diferente EXPR:e2{:
+        String v = GeneradorTresDirecciones.nuevaEtiqueta();
+        String f = GeneradorTresDirecciones.nuevaEtiqueta();
+        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.IFEQUAL, e1, e2, f);    
+        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, v);
+        RESULT = new DosEtiquetas(v, f); 
+    :}
+
+    |EXPR:e1 Menor EXPR:e2{:
+        String v = GeneradorTresDirecciones.nuevaEtiqueta();
+        String f = GeneradorTresDirecciones.nuevaEtiqueta();
+	GeneradorTresDirecciones.generador(GeneradorTresDirecciones.IFMENOR, e1, e2, v);
+        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, f);
+        RESULT = new DosEtiquetas(v, f);
+    :}
+
+    |EXPR:e1 MenorIgual EXPR:e2 {:
+        String v = GeneradorTresDirecciones.nuevaEtiqueta();
+	String f = GeneradorTresDirecciones.nuevaEtiqueta();
+	GeneradorTresDirecciones.generador(GeneradorTresDirecciones.IFMENORIGUAL, e2, e1, f);
+	GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, v);
+        RESULT = new DosEtiquetas(v, f);
+    :}
+    
+    |EXPR:e1 Mayor EXPR:e2 {:
+        String v = GeneradorTresDirecciones.nuevaEtiqueta();
+	String f = GeneradorTresDirecciones.nuevaEtiqueta();
+	GeneradorTresDirecciones.generador(GeneradorTresDirecciones.IFMAYOR, e2, e1, v);
+	GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, f);
+        RESULT = new DosEtiquetas(v, f);
+    :}
+
+    |EXPR:e1 MayorIgual EXPR:e2 {:
+        String v = GeneradorTresDirecciones.nuevaEtiqueta();
+	String f = GeneradorTresDirecciones.nuevaEtiqueta();
+	GeneradorTresDirecciones.generador(GeneradorTresDirecciones.IFMAYORIGUAL, e1, e2, f);
+	GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, v);
+        RESULT = new DosEtiquetas(v, f);
+    :}
+
+    |Negacion CONDICION:cond {:
+        RESULT = new DosEtiquetas(cond.f(), cond.v());
+    :}
+
+    /*|CONDICION:cond1 Or{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL, null, null, cond1.f());:} CONDICION:cond2{:
+    
+                        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, cond2.v());
+                        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL, null, null, cond1.v());
+                        RESULT = new DosEtiquetas(cond2.v(), cond2.f());
+                        :}
+       
+   
+    |CONDICION:cond1{: GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL, null, null, cond1.v());:} And CONDICION:cond2{:
+       
+        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL, null, null, cond1.f());
+	GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO, null, null, cond2.f());
+	RESULT = new DosEtiquetas(cond2.v(), cond2.f());
+    :}*/
+;
+
+SENTENCIA_WHILE::=parteWhile:et{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL,null,null,et.getInicio());
+                :}CONDICION:c ParentesisC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL,null,null,c.v());
+                :}SENT{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.GOTO,null,null,et.getInicio());
+                        GeneradorTresDirecciones.generador(GeneradorTresDirecciones.LABEL,null,null,c.f());
+                :}
+;
+parteWhile::=While ParentesisA{:
+                                String inicio=GeneradorTresDirecciones.nuevaEtiqueta();
+                                String fin=GeneradorTresDirecciones.nuevaEtiqueta();
+                                RESULT = new EtiquetaRedir(inicio,fin);
+                              :}
+;
+
+// Funciones
+FUNCION::=Int Id:nombreFuncion ParentesisA ParentesisC {:
+            System.out.println("Yisus1");
+            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+          :}LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+          |String Id:nombreFuncion ParentesisA ParentesisC {:
+             System.out.println("Yisus2");
+            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+          :}LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+          |Float Id:nombreFuncion ParentesisA ParentesisC {:
+            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+            System.out.println("Yisus3");
+          :}LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+          |CharType Id:nombreFuncion ParentesisA ParentesisC {:
+            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+            System.out.println("Yisus4");
+          :}LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+          |Bool Id:nombreFuncion ParentesisA ParentesisC {:
+            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+            System.out.println("Yisus5");
+          :}LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+         |Int Id:nombreFuncion ParentesisA {:
+           GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+            System.out.println("Yisus6");
+          :}PARAMETROS:paramsFuncion ParentesisC LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+         |String Id:nombreFuncion ParentesisA {:
+            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+            System.out.println("Yisus7");
+          :}PARAMETROS:paramsFuncion ParentesisC LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+          |Float Id:nombreFuncion ParentesisA {:
+            GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+            System.out.println("Yisus8");
+          :}PARAMETROS:paramsFuncion ParentesisC LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+          |Bool Id:nombreFuncion ParentesisA {:
+           GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+            System.out.println("Yisus9");
+          :}PARAMETROS:paramsFuncion ParentesisC LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+
+          |CharType Id:nombreFuncion ParentesisA {:
+           GeneradorTresDirecciones.generador(GeneradorTresDirecciones.FUNCION,nombreFuncion.toString(),null,null);
+            System.out.println("Yisus10");
+          :}PARAMETROS:paramsFuncion ParentesisC LlaveA SENTENCIA LlaveC {:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.CIERREFUNCION,nombreFuncion.toString(),null,null);:}
+;
+
+PARAMETROS::=PARAMETROS_AUX
+             |PARAMETROS_AUX Coma PARAMETROS 
+;
+
+
+PARAMETROS_AUX::=Entero:n1{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.PARAMETRO,n1.toString(),null,null);:}
+                |Cadena:n1{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.PARAMETRO,n1.toString(),null,null);:} 
+                |Flotante:n1{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.PARAMETRO,n1.toString(),null,null);:} 
+                |Boolean:n1{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.PARAMETRO,n1.toString(),null,null);:} 
+                |Char:n1{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.PARAMETRO,n1.toString(),null,null);:} 
+                |Id:n1{:GeneradorTresDirecciones.generador(GeneradorTresDirecciones.PARAMETRO,n1.toString(),null,null);:}
+;

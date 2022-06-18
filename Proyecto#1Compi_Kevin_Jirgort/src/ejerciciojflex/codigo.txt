@@ -1,0 +1,97 @@
+int main(){
+	int val#
+    	int num = 12#
+	int num23=2#
+    	int num2=2+2*5/7*8#
+    	int num3 = 5/5#
+   	int num4 = 5#
+   	val = num4+num+num23#
+    	int num5 = 10-2#
+	int num19 = num2#
+	val = num3#
+	int num21 = num4 + num#
+	int num22 = num4 - num#
+	int num23 = num4 * num#
+	int num24 = num4 / num#
+	int val1#
+	val1 = num4#
+	val=val1#
+	val = num4 - num#
+	val = num4 * num#
+	val = num4 / num#
+
+    	float num6#
+    	float num7 = 15.7 / 15.7*5.1#
+    	float num8 = 16.7#
+    	float num9 = 15.5 + 15.5#
+    	float num10 = 15.6 *17.6#
+    	float num11 = 15.5 - 20.2#
+    	num6 = 67.2#
+	float num20 = num8#
+	num6 = num9#
+
+    	float num12 = 10.5 + 5#
+    	float num13 = 7 + 9.5#
+    	float num14 = 15.5 / 2#
+    	float num14 = 5 / 10.6#
+    	float num15 = 10.5 * 2#
+    	float num16 = 5 * 2.7#
+    	float num17 = 9.9 - 9#
+    	float num18 = 10 - 9.9#
+	float num25 = num8 + num9+num24#
+	float num26 = num8 - num9#
+	float num27 = num8 * num9#
+	float num28 = num8 / num9#
+	num27 = num12 + num17#
+	num27 = num12 - num17#
+	num27 = num12 * num17#
+	num27 = num12 / num17#
+
+    	string str#
+    	string str2 = "Hola xD"#
+    	string str3 = "Hola" + "xD"#
+    	str = str2#
+    	str = "El yisus"#
+    	string strr = str#
+
+	char myvar#
+	char myvar2 = 'h'#
+	myvar = 'g'#
+	char myvar3 = myvar#
+	myvar3 = myvar2#
+
+	bool x2we#
+	bool x1 = true#
+	bool x2 = false#
+	bool x = true#
+	bool x3 = x2#
+	x = true#
+	x3 = false#
+	x2 = x1#
+	
+	read("hola")#
+	while(x==4){
+		num=num12#
+	}
+	if(x==0){
+		if(x2==x){
+			if(x3==x){
+				num=num12#
+			}
+		}
+	}
+	print(num+num4)#
+	x1=x2#
+	
+
+int funcPrueba(num,34,"SEXOOOOO"){
+	int num3222 = 43#
+}
+
+string funcPrueba12(){
+	string val747474 = "54332"#
+}
+
+
+}
+
